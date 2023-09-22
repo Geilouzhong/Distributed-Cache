@@ -1,6 +1,6 @@
 #ifndef HEARTBEAT_HPP
 #define HEARTBEAT_HPP
-#include "cache_server.hpp"
+#include "server.h"
 class iplistchange_class{
 private:
     std::shared_ptr<ConsistentHash> key_addr;
