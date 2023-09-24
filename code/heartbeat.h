@@ -1,5 +1,5 @@
-#ifndef HEARTBEAT_HPP
-#define HEARTBEAT_HPP
+#ifndef HEARTBEAT_H
+#define HEARTBEAT_H
 #include "server.h"
 class iplistchange_class{
 private:
@@ -306,7 +306,7 @@ void Heartbeat::reflesh_handler(){
     (*key_addr).RefreshIPList(*ipport_list);
     for(int i=0; i<key_send.size(); i++){
         (*sendout_bk)[(*key_addr).GetServerIndex(key_send[i])].push_back(key_send[i]);
-    }
+    } 
     if(!(sendout_bk->empty())){
         signal(SIGPIPE, SIG_IGN);
         int count=0;        
@@ -335,4 +335,4 @@ void Heartbeat::reflesh_handler(){
 }
 
 
-#endif /* HEARTBEAT_HPP */
+#endif 
