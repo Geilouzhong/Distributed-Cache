@@ -2,15 +2,15 @@
 #define CACHE_SERVER_H
 #include <cstring>
 #include <cctype>
-#include <fcntl.h>
-#include "wrap.h"
-#include "json.hpp"
-#include "LRUCache.h"
-#include <signal.h>
-#include "threadpool.h"
-#include "consistenthash.h"
 #include <unordered_set>
-#include "log.h"
+#include <fcntl.h>
+#include <signal.h>
+#include "LRUCache.h"
+#include "consistenthash.h"
+#include "../utils/json.hpp"
+#include "../utils/wrap.h"
+#include "../utils/threadpool.h"
+#include "../utils/log.h"
 
 #define HEART_BEAT 2
 #define KEY_VALUE_REQUEST 0
