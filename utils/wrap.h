@@ -1,11 +1,56 @@
 #ifndef WRAP_H
 #define WRAP_H
-#include "iostream"
+#include <iostream>
+#include <sys/time.h>
 #include "unistd.h"
 #include "arpa/inet.h"
 #include "sys/epoll.h"
 #include "cerrno"
 #include "pthread.h"
+
+struct OneIPList
+{
+public:
+    std::string ip;
+    int port;
+};
+
+OneIPList GetIPList(std::string cacheip){
+    int cut = cacheip.find_last_of(':');
+    OneIPList iptest;
+    iptest.ip = cacheip.substr(0,cut);
+    iptest.port = std::stoi(cacheip.substr(cut+1));
+    //std::cout << iptest.ip << " " << iptest.port << std::endl;
+    return iptest;
+}
+
+std::string Randstr(const int len)
+{
+    struct timeval timeSeed;
+    gettimeofday(&timeSeed,NULL);
+    srand(1000000 * timeSeed.tv_sec + timeSeed.tv_usec);
+    std::string ans;
+    int i;
+    for (i = 0; i < len; i++)
+    {
+        char c;
+        switch ((rand() % 3))
+        {
+        case 1:
+            c = 'A' + rand() % 26;
+            break;
+        case 2:
+            c = 'a' + rand() % 26;
+            break;
+        default:
+            c = '0' + rand() % 10;
+        }
+        ans += c;
+    }
+    ans[++i] = '\0';
+    return ans;
+}
+
 void perr_exit(const char* s){
     perror(s);
     exit(-1);
@@ -116,6 +161,23 @@ auto Socket_connect(const struct sockaddr* sa, socklen_t salen){
     info_con.cfd = fd;
     info_con.n = n;
     return info_con;
+}
+
+/* Master中使用 */
+int Socket_connect(bool first_call, const struct sockaddr* sa, socklen_t salen){
+    int n, fd;
+    do{
+        if(!first_call){    
+            close(fd);
+            sleep(1);
+        }
+        fd = Socket(AF_INET, SOCK_STREAM, 0);
+        n = connect(fd, sa, salen);
+        first_call = false;
+    }while(n<0);
+    auto flags = fcntl(fd,F_GETFL,0);
+    fcntl(fd,F_SETFL,flags|O_NONBLOCK);
+    return fd;
 }
 ssize_t Read(int cfd, char *buf, int size){
     ssize_t n;

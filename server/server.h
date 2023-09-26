@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include "LRUCache.h"
-#include "consistenthash.h"
+#include "../utils/consistenthash.h"
 #include "../utils/json.hpp"
 #include "../utils/wrap.h"
 #include "../utils/threadpool.h"
