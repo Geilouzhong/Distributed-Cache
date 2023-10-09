@@ -1,5 +1,5 @@
 //master的基础配置
-#include "master_json.h"
+#include "master.h"
 using json = nlohmann::json;
 using namespace std;
 
@@ -46,30 +46,22 @@ void* masterhandler(void* arg1)
 			int curfd = ep[i].data.fd;
             if(0>nready)
                 continue;
-			if(curfd==server_fd)//当前的文件描述符是不是用于监听的
+			if(curfd==server_fd)
 			{
-				//socklen_t clilen = sizeof(caddr);
-				//int client_fd = Accept(server_fd,(struct sockaddr *)&caddr,&clilen);//建立新的连接
 				int client_fd = Accept(curfd, NULL, NULL);
-				//Accept()返回值：函数调用成功，得到一个文件描述符，用于和建立连接的这个客户端通信，调用失败返回 -1
-				//inet_ntop将大端的整形数, 转换为小端的点分十进制的IP地址
-				//ntohs将一个短整形从网络字节序 -> 主机字节序
+
 				cout<<"received from "<<\
                 inet_ntop(AF_INET, &caddr.sin_addr, str, sizeof(str))<<\
                 " at PORT "<<ntohs(caddr.sin_port)<<endl;
                 cout<<" cfd "<<client_fd<<"---client"<<++num<<endl;
-                //显示对端的ip和端口
-                //printf("对端的ip为：%s\n",inet_ntoa(caddr.sin_addr));
-                //printf("对端的port为：%d\n",ntohs(caddr.sin_port));
-				// 设置完成之后, 读写都变成了非阻塞模式
+
 				int  flag = fcntl(client_fd, F_GETFL);
 				flag |= O_NONBLOCK;
                 fcntl(client_fd, F_SETFL, flag);
-                //fcntl(client_fd, F_SETFL, flag | O_NONBLOCK);
-				// 新得到的文件描述符添加到epoll模型中, 下一轮循环的时候就可以被检测了
+
                 tep.events = EPOLLIN | EPOLLOUT | EPOLLET;
                 tep.data.fd = client_fd;
-                res = Epoll_ctl(efd, EPOLL_CTL_ADD, client_fd, &tep);// 添加待检测节点到epoll实例中
+                res = Epoll_ctl(efd, EPOLL_CTL_ADD, client_fd, &tep);
 				if(res == -1)
                 {
                     perror("epoll_ctl-accept");
@@ -78,23 +70,20 @@ void* masterhandler(void* arg1)
 			}
 			else
 			{
-				//memset(buf, 0, sizeof(buf));
-				//while(1)
-				//{
+
 				int sockfd = ep[i].data.fd;
-				//buf[0] = '\0';
 				/*如果连接没有断开，接收端接收不到数据，接收数据的函数会阻塞等待数据到达，
 				数据到达后函数解除阻塞，开始接收数据，当发送端断开连接，接收端无法接收到
 				任何数据，但是这时候就不会阻塞了，函数直接返回0。*/      
-				//n,实际接收的字节数
-				//buf: 指向一块有效内存，用于存储接收是数据        
 				ssize_t n = unblock_read_net(sockfd, buf, sizeof(buf));
-				if(0==n){//对方断开了连接
+
+				// 对端断开连接
+				if(0==n){
 					res = Epoll_ctl(efd, EPOLL_CTL_DEL, sockfd, NULL);
 					Close(sockfd);
 					cout<<"client["<<sockfd<<"] closed connection"<<endl;
 				}
-				else if(0>n)//接收数据失败了
+				else if(0>n)	// 接收失败
 				{
 					if(errno == EAGAIN)
 					{
@@ -120,8 +109,7 @@ void* masterhandler(void* arg1)
 						vector<string> vec=info["data"]["iplist"];
 						if(vec.size()>0)
 							IPportlist.assign(vec.begin(), vec.end());
-						//masterip=masterdata.substr(0,9);
-						//masterport=masterdata.substr(10,4);
+							
 						int cut = masterdata.find_last_of(':');
 						masterip = masterdata.substr(0,cut);
 						masterport = masterdata.substr(cut+1);

@@ -195,7 +195,7 @@ void *heartstate(void* arg1)//这个函数用来检测cache是否正常
                     auto iterr = precachestatemap.find(iter->first);
                     if(iterr!=precachestatemap.end())
                     {
-                        if(iter->second <= iterr->second)   // second 方法得到的是map 中的value
+                        if(iter->second <= iterr->second)   
                         {
                             psshutport=iter->first;
                             psshutip=heartip;
@@ -241,7 +241,7 @@ void *masterstate(void *arg1)//这个函数用来检测发送心跳包的master�
                 auto iterr = premasterstatemap.find(iter->first);
                 if(iterr!=premasterstatemap.end())
                 {
-                    if(iter->second <= iterr->second)   // second 方法得到的是map 中的value
+                    if(iter->second <= iterr->second)   
                     {
                         //arg->LogINFO("add new cache");
                         std::cout << IPportlist.size() << std::endl;
@@ -249,8 +249,11 @@ void *masterstate(void *arg1)//这个函数用来检测发送心跳包的master�
                             std::cout << IPportlist[i] << std::endl;
                         for(int i=0;i<IPportlist.size();i++)
                         {
-                            std::string IPnow=IPportlist[i].substr(0,9);
-                            std::string Portnow=IPportlist[i].substr(10,4);
+                            int cut = IPportlist[i].find_last_of(':');
+                            std::string IPnow=IPportlist[i].substr(0,cut);
+                            std::string Portnow=IPportlist[i].substr(cut + 1);
+                            // std::string IPnow=IPportlist[i].substr(0,9);
+                            // std::string Portnow=IPportlist[i].substr(10,4);
                             struct sockaddr_in serv_addr;
                             socklen_t serv_addr_len;
                             signal(SIGPIPE, SIG_IGN);

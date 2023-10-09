@@ -2,6 +2,7 @@
 #define WRAP_H
 #include <iostream>
 #include <sys/time.h>
+#include <fcntl.h>
 #include "unistd.h"
 #include "arpa/inet.h"
 #include "sys/epoll.h"
@@ -153,7 +154,7 @@ struct info_conn{
     int cfd;
     int n;
 };
-auto Socket_connect(const struct sockaddr* sa, socklen_t salen){
+info_conn Socket_connect(const struct sockaddr* sa, socklen_t salen){
     int n, fd;
     struct info_conn info_con;
     fd = Socket(AF_INET, SOCK_STREAM, 0);
