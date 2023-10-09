@@ -42,7 +42,7 @@ int main(){
     auto ipport_list = std::make_shared<std::vector<std::string>>();
     auto LC = std::make_shared<LRUCache>(100);
     auto LC_BK = std::make_shared<LRUCache>(100);
-    auto ThrPl = std::make_shared<ThreadPool>(10,20);
+    auto ThrPl = std::make_shared<ThreadPool>(10);
     pthread_t tid_heartbeat;
     struct heartbeat_struct heartbeat_arg;
     heartbeat_arg.ThrPl = ThrPl;
